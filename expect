@@ -1,0 +1,47 @@
+--- &1
+Foo: &2 !!perl/hash:SQL::Translator::Schema::Table
+  _DEBUG: 0
+  _ERROR: Field "id" does not exist
+  _ID: SQL::Translator::Schema::Table
+  fields:
+    id: !!perl/hash:SQL::Translator::Schema::Field
+      _DEBUG: 0
+      _ERROR: ''
+      _ID: SQL::Translator::Schema::Field
+      data_type: int
+      is_nullable: 0
+      name: id
+      order: 1
+      sql_data_type: 4
+      table: *2
+  name: Foo
+  order: 1
+  schema: &3 !!perl/hash:SQL::Translator::Schema
+    _DEBUG: 0
+    _ERROR: Table "Foo" does not exist
+    _ID: SQL::Translator::Schema
+    _order:
+      proc: 0
+      table: 1
+      trigger: 0
+      view: 0
+    tables: *1
+    translator: !!perl/hash:SQL::Translator
+      _DEBUG: 0
+      _ERROR: ''
+      _ID: SQL::Translator
+      data: !!perl/ref
+        =: |
+          CREATE TABLE [Foo] (
+             [id] int NOT NULL
+          );
+      debug: 0
+      filters: []
+      parser: !!perl/code '{ "DUMMY" }'
+      parser_type: SQL::Translator::Parser::SQLServer
+      producer: !!perl/code '{ "DUMMY" }'
+      producer_type: CODE
+      quote_field_names: 0E0
+      quote_identifiers: 0E0
+      quote_table_names: 0E0
+      schema: *3
