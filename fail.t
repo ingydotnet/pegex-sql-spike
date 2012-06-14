@@ -1,4 +1,5 @@
 use strict;
+use lib 'lib';
 use Test::More tests => 1;
 use SQL::Translator;
 use Test::Differences;
@@ -16,6 +17,8 @@ CREATE TABLE [Foo] (
 
 my $translator = SQL::Translator->new();
 
-my $got = Dump $translator->translate( from => 'SQLServer', data => \$input )->{tables};
+$translator->translate( from => 'SQLServer', data => \$input ) or die $translator->error;
+
+my $got = Dump $translator->schema->{tables};
 
 eq_or_diff $got, $expect;
