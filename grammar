@@ -1,0 +1,175 @@
+# TODO FInd out when this runs...
+#{
+#    my ( %tables, @table_comments, $table_order, %procedures, $proc_order, %views, $view_order );
+#
+#    sub _err {
+#      my $max_lines = 5;
+#      my @up_to_N_lines = split (/\n/, $_[1], $max_lines + 1);
+#      die sprintf ("Unable to parse line %d:\n%s\n",
+#        $_[0],
+#        join "\n", (map { "'$_'" } @up_to_N_lines[0..$max_lines - 1 ]), @up_to_N_lines > $max_lines ? '...' : ()
+#      );
+#    }
+#}
+
+startrule : <statement>+
+#   {
+#      return {
+#         tables     => \%tables,
+#         procedures => \%procedures,
+#         views      => \%views,
+#      }
+#   }
+
+statement : <create_table>
+
+create_table :
+    /(?i:create<WS>+table)/
+    <ident>
+    /~<LPAREN>~/
+    [ <create_def>+ % /<COMMA>/ ]
+    /~<RPAREN>~/
+    <lock>?
+    <on_system>?
+    <END_STATEMENT>
+
+# #    {
+# #        my $table_owner = $item[3]{'owner'};
+# #        my $table_name  = $item[3]{'name'};
+# #
+# #        if ( @table_comments ) {
+# #            $tables{ $table_name }{'comments'} = [ @table_comments ];
+# #            @table_comments = ();
+# #        }
+# #
+# #        $tables{ $table_name }{'order'}  = ++$table_order;
+# #        $tables{ $table_name }{'name'}   = $table_name;
+# #        $tables{ $table_name }{'owner'}  = $table_owner;
+# #        $tables{ $table_name }{'system'} = $item[7];
+# #
+# #        my $i = 0;
+# #        for my $def ( @{ $item[5] } ) {
+# #            if ( $def->{'supertype'} eq 'field' ) {
+# #                my $field_name = $def->{'name'};
+# #                $tables{ $table_name }{'fields'}{ $field_name } =
+# #                    { %$def, order => $i };
+# #                $i++;
+# #
+# #                if ( $def->{'is_primary_key'} ) {
+# #                    push @{ $tables{ $table_name }{'constraints'} }, {
+# #                        type   => 'primary_key',
+# #                        fields => [ $field_name ],
+# #                    };
+# #                }
+# #            }
+# #            elsif ( $def->{'supertype'} eq 'constraint' ) {
+# #                push @{ $tables{ $table_name }{'constraints'} }, $def;
+# #            }
+# #            else {
+# #                push @{ $tables{ $table_name }{'indices'} }, $def;
+# #            }
+# #        }
+# #    }
+# 
+create_def : <field>
+# 
+field : <field_name><data_type><field_qualifier>*
+#    {
+#        my %qualifiers  = map { %$_ } @{ $item{'field_qualifier(s?)'} || [] };
+#        my $nullable = defined $qualifiers{'nullable'}
+#                   ? $qualifiers{'nullable'} : 1;
+#        $return = {
+#            supertype      => 'field',
+#            name           => $item{'field_name'},
+#            data_type      => $item{'data_type'}{'type'},
+#            size           => $item{'data_type'}{'size'},
+#            nullable       => $nullable,
+#            default        => $qualifiers{'default_val'},
+#            is_auto_inc    => $qualifiers{'is_auto_inc'},
+##            is_primary_key => $item{'primary_key'}[0],
+#        }
+#    }
+# 
+field_qualifier : <nullable>
+# #    {
+# #        $return = {
+# #             nullable => $item{'nullable'},
+# #        }
+# #    }
+# 
+# field_qualifier : default_val
+# #    {
+# #        $return = {
+# #             default_val => $item{'default_val'},
+# #        }
+# #    }
+# 
+# field_qualifier : auto_inc
+# #    {
+# #        $return = {
+# #             is_auto_inc => $item{'auto_inc'},
+# #        }
+# #    }
+# 
+field_name : <word>
+   | /<LSQUARE><word><RSQUARE>/
+# #   { $return = $item[1] }
+# #   { $return = $item[2] }
+# 
+data_type : /~<word><field_size>?~/
+
+#    {
+#        $return = {
+#            type => $item[1],
+#            size => $item[2][0]
+#        }
+#    }
+# 
+lock : /((?i:lock<WS>+datarows))/
+
+field_size : /(?:<LPAREN><num_range><RPAREN>)/
+
+# { $item{'num_range'} }
+
+num_range : /(<digits>(?:<COMMA><digits>)?)/
+
+# #    { $return = $item[1].','.$item[3] }
+# #    { $return = $item[1] }
+# 
+
+nullable : /((?i:(?:not)? null))/
+# #    { $return = 0 }
+#     | /null/i
+# #    { $return = 1 }
+# 
+# default_val : /default/i /null/i
+#     { $return = 'null' }
+#    | /default/i /'[^']*'/
+#     { $item[2]=~ s/'//g; $return = $item[2] }
+#    | /default/i WORD
+#     { $return = $item[2] }
+# 
+# auto_inc : /identity/i { 1 }
+# 
+on_system : /((?i:on system))/
+# #    { $return = 1 }
+# 
+ident : /~<SINGLE><word><DOT><word><SINGLE>/ |
+        /~<LSQUARE><word><DOT><word><RSQUARE>/ |
+        /~<LSQUARE><word><RSQUARE><DOT><LSQUARE><word><RSQUARE>/ |
+        /~<LSQUARE><word><RSQUARE>/ |
+        /~<word><DOT><word>/ |
+        /~<word>/
+#    { $return = { owner => $item[2], name => $item[4] } }
+#    { $return = { owner => $item[2], name => $item[6] } }
+#    { $return = { name  => $item[2] } }
+#    { $return = { owner => $item[1], name => $item[3] } }
+#    { $return = { name  => $item[1] } }
+
+END_STATEMENT : /~<SEMI>~/ | <go>
+
+go : /(?i:go)/
+
+word : /([<WORD><HASH>]+)/
+
+digits : /<DIGIT>+/

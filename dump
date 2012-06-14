@@ -1,0 +1,23 @@
+
+
+1..1
+# --- |
+# ---
+# startrule:
+#   - statement:
+#       create_table:
+#         - ident:
+#             - Foo
+#             - Foo
+#         -
+#           - create_def:
+#               field:
+#                 - field_name: id
+#                 - data_type:
+#                     - int
+#                     - ~
+#                 -
+#                   - field_qualifier:
+#                       nullable: NOT NULL
+# ...
+#   at fail.t line 32
